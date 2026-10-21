@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCategories } from "@/lib/api";
 import type { Category } from "@/types/product";
+import AdminGuard from "@/components/ui/AdminGuard";
 
 function CategoryOptions({
   categories,
@@ -59,7 +60,8 @@ export default function AddProductPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
+    <AdminGuard>
+      <main className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="mx-auto max-w-3xl">
         <Link
           href="/admin/products"
@@ -172,5 +174,6 @@ export default function AddProductPage() {
         </form>
       </div>
     </main>
+    </AdminGuard>
   );
 }
