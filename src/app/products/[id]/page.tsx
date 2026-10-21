@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { getProductById } from "@/lib/api";
 import type { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
+import { getDisplayPrice } from "@/utils/prices";
 
 export default function ProductDetailsPage() {
   const { addToCart } = useCart();
@@ -96,7 +97,7 @@ export default function ProductDetailsPage() {
           </h1>
 
           <p className="mb-5 text-2xl font-semibold">
-            ${Number(product.price).toFixed(2)}
+            ${getDisplayPrice(product).toFixed(2)}
           </p>
 
           <p className="mb-8 leading-7 text-gray-600">

@@ -2,8 +2,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -45,8 +47,7 @@ export default function LoginPage() {
         throw new Error("The API did not return an access token.");
       }
 
-      // Temporary login proof. We'll add a proper session flow next.
-      sessionStorage.setItem("store_access_token", data.access_token);
+      login(data.access_token);
       setMessage("Login successful!");
     } catch (error) {
       setMessage(
