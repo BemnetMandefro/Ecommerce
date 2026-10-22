@@ -134,10 +134,10 @@ export default function AdminPage() {
               Browse your product categories.
             </p>
             <a
-              href="/products"
+              href="/admin/categories"
               className="mt-5 inline-block font-medium text-blue-600 hover:text-blue-800"
             >
-              Browse Store →
+              Manage Categories →
             </a>
           </div>
 

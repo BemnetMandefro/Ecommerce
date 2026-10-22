@@ -35,13 +35,14 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          data.message
-            ? String(data.message)
-            : "Login failed. Check your email and password."
-        );
-      }
+     if (!response.ok) {
+     console.error("Login failed:", response.status, data);
+     throw new Error(
+     data.message
+      ? String(data.message)
+      : `Login failed (${response.status}). Check your email and password.`
+  );
+}
 
       if (typeof data.access_token !== "string") {
         throw new Error("The API did not return an access token.");

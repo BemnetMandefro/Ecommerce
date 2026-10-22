@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getCategories } from "@/lib/api";
 import type { Category } from "@/types/product";
 import AdminGuard from "@/components/ui/AdminGuard";
+import { useAuth } from "@/context/AuthContext";
 
 function CategoryOptions({
   categories,
@@ -34,6 +35,8 @@ function CategoryOptions({
 }
 
 export default function AddProductPage() {
+  const { accessToken } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -51,13 +54,65 @@ export default function AddProductPage() {
       );
   }, []);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  
+async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+  setMessage("");
 
-    setMessage(
-      "Form validated successfully. No product has been sent to the API yet."
-    );
+  if (!accessToken) {
+    setMessage("Please log in again before creating a product.");
+    return;
   }
+
+  const parsedPrice = Number(price);
+  const parsedCategoryId = Number(categoryId);
+
+  if (
+    !Number.isFinite(parsedPrice) ||
+    parsedPrice <= 0 ||
+    !Number.isInteger(parsedCategoryId) ||
+    parsedCategoryId <= 0
+  ) {
+    setMessage("Please enter a valid price and choose a category.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const response = await fetch("/api/admin/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        title: title.trim(),
+        price: parsedPrice,
+        description: description.trim(),
+        categoryId: parsedCategoryId,
+        images: [image.trim()],
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not create product.");
+    }
+
+    setMessage(`Product "${data.title}" was created successfully.`);
+  } catch (error) {
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Something went wrong. Please try again."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+}
+
 
   return (
     <AdminGuard>
@@ -158,9 +213,10 @@ export default function AddProductPage() {
 
           <button
             type="submit"
+            disabled={isSubmitting}
             className="w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           >
-            Validate Product
+          {isSubmitting ? "Creating Product..." : "Create Product"}
           </button>
 
           {message && (
